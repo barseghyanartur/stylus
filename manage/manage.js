@@ -55,6 +55,11 @@ function onRuntimeMessage(msg) {
     case 'styleDeleted':
       handleDelete(msg.id);
       break;
+    case 'highlightStyle':
+      if (!highlightEntry(msg) && showStyles.inProgress) {
+        once(window, 'showStyles:done', () => highlightEntry(msg));
+      }
+      break;
   }
 }
 
@@ -99,6 +104,7 @@ function initGlobalEvents() {
 
 
 function showStyles(styles = []) {
+  showStyles.inProgress = true;
   const sorted = styles
     .map(style => ({name: style.name.toLocaleLowerCase(), style}))
     .sort((a, b) => (a.name < b.name ? -1 : a.name === b.name ? 0 : 1));
@@ -134,13 +140,11 @@ function showStyles(styles = []) {
       debounce(handleEvent.loadFavicons, 16);
     }
     if (sessionStorage.justEditedStyleId) {
-      const entry = $(ENTRY_ID_PREFIX + sessionStorage.justEditedStyleId);
+      highlightEntry({id: sessionStorage.justEditedStyleId});
       delete sessionStorage.justEditedStyleId;
-      if (entry) {
-        animateElement(entry);
-        scrollElementIntoView(entry);
-      }
     }
+    window.dispatchEvent(new CustomEvent('showStyles:done'));
+    showStyles.inProgress = false;
   }
 }
 
@@ -393,8 +397,7 @@ function handleUpdate(style, {reason, method} = {}) {
   }
   filterAndAppend({entry});
   if (!entry.matches('.hidden') && reason !== 'import') {
-    animateElement(entry);
-    scrollElementIntoView(entry);
+    highlightEntry({entry});
   }
 
   function handleToggledOrCodeOnly() {
@@ -537,4 +540,26 @@ function usePrefsDuringPageLoad() {
   }
   startObserver();
   onDOMready().then(() => observer.disconnect());
+}
+
+
+// TODO: move to dom.js and use where applicable
+function once(element, event, callback, options) {
+  element.addEventListener(event, onEvent, options);
+  function onEvent(...args) {
+    element.removeEventListener(event, onEvent);
+    callback.call(element, ...args);
+  }
+}
+
+
+function highlightEntry({
+  id,
+  entry = $(ENTRY_ID_PREFIX + id),
+}) {
+  if (entry) {
+    animateElement(entry);
+    scrollElementIntoView(entry);
+    return true;
+  }
 }

@@ -88,7 +88,7 @@ function initPopup(url) {
   };
   setupLivePrefs();
 
-  $('#find-styles-link').onclick = handleEvent.openURLandHide;
+  $$('#find-styles a').forEach(a => (a.onclick = handleEvent.openURLandHide));
   Object.assign($('#popup-manage-button'), {
     onclick: handleEvent.openManager,
     onmouseup: handleEvent.openManager,
@@ -110,9 +110,11 @@ function initPopup(url) {
       installed);
   }
 
-  // find styles link
-  $('#find-styles a').href =
-    'https://userstyles.org/styles/browse/all/' +
+  // find styles links
+  // for freestyler we strip 'www.' when hostname has 3+ parts
+  $('#find-styles a[href*="freestyler"]').href +=
+    encodeURIComponent(new URL(url).hostname.replace(/^www\.(?=.+?\.)/, ''));
+  $('#find-styles a[href*="userstyles"]').href +=
     encodeURIComponent(url.startsWith('file:') ? 'file:' : url);
 
   if (!url) {
