@@ -135,6 +135,10 @@
     "message": "Double-click to maximize/restore the height",
     "description": "Tooltip for the resize grip in style editor"
   },
+  "dysfunctional": {
+    "message": "Stylus cannot function because Firefox applies its website cookies policy to unrelated WebExtensions storages used by Stylus such as IndexedDB and localStorage even though Stylus is not a website and doesn't use cookies.\n\nYou can add an exclusion for Stylus:\n1. open Firefox options\n2. go to Privacy & Security\n3. set History mode to 'Use custom settings'\n4. click 'Exceptions'\n5. paste our manifest URL and click 'Allow'.\n\nThe actual manifest URL is shown below, also on about:debugging page.",
+    "description": "Displayed in Firefox when its settings make Stylus dysfunctional"
+  },
   "genericDisabledLabel": {
     "message": "Disabled",
     "description": "Used in various lists/options to indicate that something is disabled"

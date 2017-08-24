@@ -1,5 +1,29 @@
 'use strict';
 
+if (navigator.userAgent.includes('Firefox')) {
+  // abort if dysfunctional
+  (() => {
+    try {
+      // eslint-disable-next-line no-unused-vars
+      const ok = indexedDB;
+    } catch (e) {
+      location.href = '/msgbox/dysfunctional.html';
+    }
+  })();
+  // add favicon in Firefox
+  setTimeout(() => {
+    const iconset = ['', 'light/'][prefs.get('iconset')] || '';
+    for (const size of [38, 32, 19, 16]) {
+      document.head.appendChild($element({
+        tag: 'link',
+        rel: 'icon',
+        href: `/images/icon/${iconset}${size}.png`,
+        sizes: size + 'x' + size,
+      }));
+    }
+  });
+}
+
 if (!navigator.userAgent.includes('Windows')) {
   document.documentElement.classList.add('non-windows');
 }
@@ -35,20 +59,6 @@ for (const type of [NodeList, NamedNodeMap, HTMLCollection, HTMLAllCollection]) 
   // throttle on continuous resizing
   window.addEventListener('resize', () => debounce(addTooltipsToEllipsized, 100));
 }
-
-// add favicon in Firefox
-// eslint-disable-next-line no-unused-expressions
-navigator.userAgent.includes('Firefox') && setTimeout(() => {
-  const iconset = ['', 'light/'][prefs.get('iconset')] || '';
-  for (const size of [38, 32, 19, 16]) {
-    document.head.appendChild($element({
-      tag: 'link',
-      rel: 'icon',
-      href: `/images/icon/${iconset}${size}.png`,
-      sizes: size + 'x' + size,
-    }));
-  }
-});
 
 
 function onDOMready() {
